@@ -24,8 +24,9 @@ void set_bit(s21_decimal *d, int index, int value) {
 }
 
 int get_sign(s21_decimal d){
-    if (get_bit(d, 127) == 1) return 1;
-    return 0;
+    int sign = 0;
+    if (get_bit(d, 127) == 1) sign = 1;
+    return sign;
 }
 
 void set_sign(s21_decimal *d, int value){
@@ -53,4 +54,16 @@ void init_decimal(s21_decimal *d){
     for (int i = 0; i < 4; i++){
         d->bit[i] = 0;
     }
+}
+
+void get_big_decimal(s21_decimal d, s21_big_decimal* b)
+{
+    b -> sign = d.bit[3] >> 31;
+    b -> scale = (d.bit[3] >> 16) & 0xFF;
+    b -> bits[0] = d.bit[0];
+    b -> bits[1] = d.bit[1];
+    b -> bits[2] = d.bit[2];
+    d.bit[3] = 0;
+    d.bit[4] = 0;
+    d.bit[5] = 0;
 }
