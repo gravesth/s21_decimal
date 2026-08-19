@@ -58,12 +58,12 @@ void init_decimal(s21_decimal *d){
 
 void get_big_decimal(s21_decimal d, s21_big_decimal* b)
 {
-    b -> sign = d.bit[3] >> 31;
+    b -> sign = (d.bit[3] >> 31) & 1;
     b -> scale = (d.bit[3] >> 16) & 0xFF;
     b -> bits[0] = d.bit[0];
     b -> bits[1] = d.bit[1];
     b -> bits[2] = d.bit[2];
-    d.bit[3] = 0;
-    d.bit[4] = 0;
-    d.bit[5] = 0;
+    b -> bits[3] = 0;
+    b -> bits[4] = 0;
+    b -> bits[5] = 0;
 }

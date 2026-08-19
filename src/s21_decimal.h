@@ -12,3 +12,5 @@ typedef struct {
     int scale;            // Масштаб (0..56 в промежуточных вычислениях)
     int sign;             // Знак (0 или 1)
 } s21_big_decimal;
+
+int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);

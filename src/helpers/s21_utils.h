@@ -13,3 +13,5 @@ int get_scale(s21_decimal d); //получить кол-во знаков пос
 void set_scale(s21_decimal *d, int scale); //установить кол-во знаков после запятой 
 
 void init_decimal(s21_decimal *d); //обнулить decimal
+
+void get_big_decimal(s21_decimal d, s21_big_decimal* b); //переход к расширенной структуре
