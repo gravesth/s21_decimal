@@ -17,3 +17,7 @@ void init_decimal(s21_decimal *d); //обнулить decimal
 void get_big_decimal(s21_decimal d, s21_big_decimal* b); //переход к расширенной структуре
 
 void init_big_decimal(s21_big_decimal *d); //инициализация расширенной структуры
+
+void big_normalize(s21_big_decimal *b_1, s21_big_decimal *b_2); //привод к общему масштабу
+
+void mul_by_10(s21_big_decimal *b); //умножение на 10 метиссы расширенной структуры (вспомогтельная функция для big_normalize)

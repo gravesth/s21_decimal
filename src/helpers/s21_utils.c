@@ -77,3 +77,30 @@ void init_big_decimal(s21_big_decimal *d)
     d->sign = 0;
 
 }
+void mul_by_10(s21_big_decimal *b)
+{
+    long long int carry = 0;
+    for (int i = 0; i < 6; i++)
+    {
+        long long int current = (long long int)b->bits[i] * 10 + carry;
+
+        b->bits[i] = current & 0xFFFFFFFF;
+
+        carry = current >> 32;
+    }
+
+}
+void big_normalize(s21_big_decimal *b_1, s21_big_decimal *b_2)
+{
+    while(b_1->scale > b_2->scale)
+    {
+        b_2->scale++;
+        mul_by_10(b_2);
+    }
+
+    while(b_1->scale < b_2->scale)
+    {
+        b_1->scale++;
+        mul_by_10(b_1);
+    }
+}
