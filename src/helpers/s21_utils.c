@@ -67,3 +67,13 @@ void get_big_decimal(s21_decimal d, s21_big_decimal* b)
     b -> bits[4] = 0;
     b -> bits[5] = 0;
 }
+void init_big_decimal(s21_big_decimal *d)
+{
+    for(int i = 0; i < 6; i++)
+    {
+        d->bits[i] = 0;
+    }
+    d->scale = 0;
+    d->sign = 0;
+
+}
