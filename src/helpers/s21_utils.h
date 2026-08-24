@@ -21,3 +21,13 @@ void init_big_decimal(s21_big_decimal *d); //инициализация расш
 void big_normalize(s21_big_decimal *b_1, s21_big_decimal *b_2); //привод к общему масштабу
 
 void mul_by_10(s21_big_decimal *b); //умножение на 10 метиссы расширенной структуры (вспомогтельная функция для big_normalize)
+
+int div_by_10(s21_big_decimal *b); //деление на 10 расширенной структуры  (для get decimal)
+
+void clean_zeroes(s21_big_decimal *b); // удаление незначащих нулей   (для get decimal)
+
+void add_by_1(s21_big_decimal *b); //прибавление 1 к метиссе  (для get decimal)
+
+void bankers_rounding(s21_big_decimal* b); //банковское округление (для get decimal)
+
+int get_decimal(s21_big_decimal b, s21_decimal *result); // переход к стандартному децималу
