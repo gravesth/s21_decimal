@@ -33,5 +33,7 @@ void bankers_rounding(s21_big_decimal* b); //банковское округле
 int get_decimal(s21_big_decimal b, s21_decimal *result); // переход к стандартному децималу
 
 
-int get_bit_big_decimal(s21_big_decimal b, int index); //получение бита из big decimal 
+int get_bit_big_decimal(s21_big_decimal b, int index); //получение бита из big decimal
+
+int is_zero(s21_decimal d); //проверка decimal на +-0
 
