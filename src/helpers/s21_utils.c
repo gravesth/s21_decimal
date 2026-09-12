@@ -169,3 +169,14 @@ int get_decimal(s21_big_decimal b, s21_decimal *result)
     }
     return error;
 }
+
+int get_bit_big_decimal(s21_big_decimal b, int index)
+{
+    int bit =  - 1;
+
+    if(index >= 0 && index < 192)
+    {
+        bit = (b.bits[index/32] >> (index % 32)) & 1;
+    }
+    return bit;
+}
