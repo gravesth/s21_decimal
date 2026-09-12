@@ -169,3 +169,25 @@ int get_decimal(s21_big_decimal b, s21_decimal *result)
     }
     return error;
 }
+
+int get_bit_big_decimal(s21_big_decimal b, int index)
+{
+    int bit =  - 1;
+
+    if(index >= 0 && index < 192)
+    {
+        bit = (b.bits[index/32] >> (index % 32)) & 1;
+    }
+    return bit;
+}
+
+
+int is_zero(s21_decimal d)
+{
+    int ans = 1;
+    for(int i = 0; i <  96 && ans; i++)
+    {
+        if(get_bit(d, i)) ans = 0;
+    }
+    return ans;
+}
