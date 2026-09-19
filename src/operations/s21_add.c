@@ -8,13 +8,28 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result)
     get_big_decimal(value_2, &b_2);
     big_normalize(&b_1, &b_2);
     int error = 0;
-    if(!(b_1.sign || b_2.sign) || (b_1.sign && b_2.sign))
+    if (!(b_1.sign || b_2.sign) || (b_1.sign && b_2.sign))
     {
 
         add_process(b_1, b_2, &result_big);
         result_big.sign = b_1.sign;
-        result_big.scale = b_1.scale;
-        error = get_decimal(result_big, result);  
     }
+    else
+    {
+
+        if (s21_is_less(abs_decimal(value_2), abs_decimal(value_1)))
+        {
+            sub_process(b_1, b_2, &result_big);
+            result_big.sign = b_1.sign;
+        }
+        else
+        {
+            sub_process(b_2, b_1, &result_big);
+            result_big.sign = b_2.sign;
+        }
+    }
+    result_big.scale = b_1.scale;
+    error = get_decimal(result_big, result);
+
     return error;
-} 
+}
