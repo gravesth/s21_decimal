@@ -234,3 +234,10 @@ void add_process(s21_big_decimal b_1, s21_big_decimal b_2, s21_big_decimal *resu
             }
         }
 }
+
+s21_decimal abs_decimal(s21_decimal b)
+{
+    s21_decimal new_b = b;
+    set_sign(&new_b, 0);
+    return new_b;
+}
