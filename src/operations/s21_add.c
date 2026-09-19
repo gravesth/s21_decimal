@@ -7,28 +7,29 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result)
     get_big_decimal(value_1, &b_1);
     get_big_decimal(value_2, &b_2);
     big_normalize(&b_1, &b_2);
-    int carry = 0;
     int error = 0;
-    if(!(b_1.sign || b_2.sign) || (b_1.sign && b_2.sign))
+    if (!(b_1.sign || b_2.sign) || (b_1.sign && b_2.sign))
     {
-        for(int i = 0; i < 192; i++)
-        {
-            int x = b_1.bits[i/32] >> (i%32) & 1;
-            int y = b_2.bits[i/32] >> (i%32) & 1;
-            int result_d = x + y + carry;
-            if(result_d < 2)
-            {
-                result_big.bits[i/32] |= (result_d << (i % 32));
-                carry = 0;
-            }
-            else{
-                result_big.bits[i/32] |= ((result_d - 2 ) << (i % 32));
-                carry = 1;
-            }
-        }
+
+        add_process(b_1, b_2, &result_big);
         result_big.sign = b_1.sign;
-        result_big.scale = b_1.scale;
-        error = get_decimal(result_big, result);  
     }
+    else
+    {
+
+        if (s21_is_less(abs_decimal(value_2), abs_decimal(value_1)))
+        {
+            sub_process(b_1, b_2, &result_big);
+            result_big.sign = b_1.sign;
+        }
+        else
+        {
+            sub_process(b_2, b_1, &result_big);
+            result_big.sign = b_2.sign;
+        }
+    }
+    result_big.scale = b_1.scale;
+    error = get_decimal(result_big, result);
+
     return error;
-} 
+}
