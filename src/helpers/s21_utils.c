@@ -192,7 +192,7 @@ int is_zero(s21_decimal d)
     return ans;
 }
 
-s21_decimal abs_big_decimal(s21_decimal b)
+s21_decimal abs_decimal(s21_decimal b)
 {
     s21_decimal new_b = b;
     set_sign(&new_b, 0);
