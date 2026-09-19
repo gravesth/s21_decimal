@@ -37,4 +37,5 @@ int get_bit_big_decimal(s21_big_decimal b, int index); //получение би
 
 int is_zero(s21_decimal d); //проверка decimal на +-0
 
-s21_decimal abs_decimal(s21_decimal b); //децимал по модулю (для сравнения по модулю)
+void sub_process(s21_big_decimal b_1, s21_big_decimal b_2, s21_big_decimal *result_big); //функция для разности decimal не смотрит на знаки decimal
+void add_process(s21_big_decimal b_1, s21_big_decimal b_2, s21_big_decimal *result_big); //функция для сложения decimal не смотрит на знаки decimal

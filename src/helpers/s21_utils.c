@@ -192,9 +192,45 @@ int is_zero(s21_decimal d)
     return ans;
 }
 
-s21_decimal abs_decimal(s21_decimal b)
+void sub_process(s21_big_decimal b_1, s21_big_decimal b_2, s21_big_decimal *result_big)
 {
-    s21_decimal new_b = b;
-    set_sign(&new_b, 0);
-    return new_b;
+    int curry = 0;
+    for (int i = 0; i < 192; i++)
+    {
+        int x = b_1.bits[i / 32] >> (i % 32) & 1;
+        int y = b_2.bits[i / 32] >> (i % 32) & 1;
+
+        int result_d = x - y - curry;
+        if (result_d >= 0)
+        {
+            (*result_big).bits[i / 32] |= (result_d << (i % 32));
+            curry = 0;
+        }
+        else
+        {
+            curry = 1;
+            (*result_big).bits[i / 32] |= ((result_d + 2) << (i % 32));
+        }
+    }
+}
+
+
+void add_process(s21_big_decimal b_1, s21_big_decimal b_2, s21_big_decimal *result_big)
+{
+    int carry = 0;
+    for(int i = 0; i < 192; i++)
+        {
+            int x = b_1.bits[i/32] >> (i%32) & 1;
+            int y = b_2.bits[i/32] >> (i%32) & 1;
+            int result_d = x + y + carry;
+            if(result_d < 2)
+            {
+                (*result_big).bits[i/32] |= (result_d << (i % 32));
+                carry = 0;
+            }
+            else{
+                (*result_big).bits[i/32] |= ((result_d - 2 ) << (i % 32));
+                carry = 1;
+            }
+        }
 }
