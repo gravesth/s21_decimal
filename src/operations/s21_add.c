@@ -18,11 +18,11 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result)
             int result_d = x + y + carry;
             if(result_d < 2)
             {
-                result_big.bits[i/32] |= ((result_d * 1) << i % 32);
+                result_big.bits[i/32] |= (result_d << (i % 32));
                 carry = 0;
             }
             else{
-                result_big.bits[i/32] |= (((result_d - 2 )* 1) << i % 32);
+                result_big.bits[i/32] |= ((result_d - 2 ) << (i % 32));
                 carry = 1;
             }
         }
