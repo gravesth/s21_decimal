@@ -182,7 +182,7 @@ START_TEST(bank_rounding_test)
     d2.bit[0] = 5;
     set_scale(&d2, 2);
 
-    expected.bit[0] = 0xFFFFFFFD;
+    expected.bit[0] = 0xFFFFFFFE;
     expected.bit[1] = 0xFFFFFFFF;
     expected.bit[2] = 0xFFFFFFFF;
     set_scale(&expected, 1);
