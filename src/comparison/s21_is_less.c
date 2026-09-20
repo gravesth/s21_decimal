@@ -1,4 +1,5 @@
-#include "comparison.h"
+#include "../s21_decimal.h"
+#include "../helpers/s21_utils.h"
 
 int s21_is_less(s21_decimal value_1, s21_decimal value_2)
 {
