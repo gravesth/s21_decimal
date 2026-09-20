@@ -1,7 +1,7 @@
 #ifndef S21_DECIMAL_H
 #define S21_DECIMAL_H
-
 #include <stdio.h>
+#include <check.h>
 
 /// основная структура(массив int из 4 чисел, где первые 3 ячейки типа int по 32 бита каждая - основное число; последняя ячейка - служебная)
 typedef struct
@@ -19,7 +19,6 @@ typedef struct
 
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
-
 int s21_is_less(s21_decimal value_1, s21_decimal value_2);
 int s21_is_less_or_equal(s21_decimal value_1, s21_decimal value_2);
 int s21_is_greater(s21_decimal value_1, s21_decimal value_2);
@@ -27,4 +26,4 @@ int s21_is_greater_or_equal(s21_decimal value_1, s21_decimal value_2);
 int s21_is_equal(s21_decimal value1, s21_decimal value2);
 int s21_is_not_equal(s21_decimal value_1, s21_decimal value_2);
 
-#endif  // S21_DECIMAL_H
+#endif 
