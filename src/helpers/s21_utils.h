@@ -1,4 +1,8 @@
+#ifndef S21_UTILS_H
+#define S21_UTILS_H
+
 #include "../s21_decimal.h"
+
 
 int get_bit(s21_decimal d, int index); //получить любой бит по индексу (0 - 127)
 
@@ -42,3 +46,5 @@ s21_decimal abs_decimal(s21_decimal b); // модуль decimal
 
 void sub_process(s21_big_decimal b_1, s21_big_decimal b_2, s21_big_decimal *result_big); //функция для разности decimal не смотрит на знаки decimal
 void add_process(s21_big_decimal b_1, s21_big_decimal b_2, s21_big_decimal *result_big); //функция для сложения decimal не смотрит на знаки decimal
+
+#endif
