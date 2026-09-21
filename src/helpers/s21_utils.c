@@ -5,7 +5,7 @@ int get_bit(s21_decimal d, int index) {
 
     if (index >= 0 && index < 128) {
         bit = 0;
-        if ((d.bit[index / 32] >> (index % 32)) & 1) {
+        if ((d.bits[index / 32] >> (index % 32)) & 1) {
             bit = 1;
         }
     }
@@ -16,9 +16,9 @@ int get_bit(s21_decimal d, int index) {
 void set_bit(s21_decimal *d, int index, int value) {
     if (d != NULL && index >= 0 && index < 128 && (value == 0 || value == 1)) {
         if (value == 1) {
-            d->bit[index / 32] |= (1U << (index % 32));
+            d->bits[index / 32] |= (1U << (index % 32));
         } else {
-            d->bit[index / 32] &= ~(1U << (index % 32));
+            d->bits[index / 32] &= ~(1U << (index % 32));
         }
     }
 }
@@ -32,50 +32,52 @@ int get_sign(s21_decimal d){
 void set_sign(s21_decimal *d, int value){
     if (d != NULL && (value == 0 || value == 1)){
         if (value == 1){
-            d->bit[3] |= (1U << 31);
+            d->bits[3] |= (1U << 31);
         } else {
-            d->bit[3] &= ~(1U << 31);
+            d->bits[3] &= ~(1U << 31);
         }
     }
 }
 
 int get_scale(s21_decimal d) {
-    return (d.bit[3] >> 16) & 0xFF;
+    return (d.bits[3] >> 16) & 0xFF;
 }
 
 void set_scale(s21_decimal *d, int scale) {
     if (d != NULL && scale >= 0 && scale <= 28) {
-        d->bit[3] &= ~(0xFF << 16);
-        d->bit[3] |= (scale << 16);
+        d->bits[3] &= ~(0xFF << 16);
+        d->bits[3] |= (scale << 16);
     }
 }
 
 void init_decimal(s21_decimal *d){
+    if (!d) return;
     for (int i = 0; i < 4; i++){
-        d->bit[i] = 0;
+        d->bits[i] = 0;
     }
 }
 
 void get_big_decimal(s21_decimal d, s21_big_decimal* b)
 {
-    b -> sign = (d.bit[3] >> 31) & 1;
-    b -> scale = (d.bit[3] >> 16) & 0xFF;
-    b -> bits[0] = d.bit[0];
-    b -> bits[1] = d.bit[1];
-    b -> bits[2] = d.bit[2];
-    b -> bits[3] = 0;
-    b -> bits[4] = 0;
-    b -> bits[5] = 0;
+    if (!b) return;
+    b->sign = (d.bits[3] >> 31) & 1;
+    b->scale = (d.bits[3] >> 16) & 0xFF;
+    b->bits[0] = d.bits[0];
+    b->bits[1] = d.bits[1];
+    b->bits[2] = d.bits[2];
+    b->bits[3] = 0;
+    b->bits[4] = 0;
+    b->bits[5] = 0;
 }
 void init_big_decimal(s21_big_decimal *d)
 {
+    if (!d) return;
     for(int i = 0; i < 6; i++)
     {
         d->bits[i] = 0;
     }
     d->scale = 0;
     d->sign = 0;
-
 }
 void mul_by_10(s21_big_decimal *b)
 {
@@ -155,6 +157,8 @@ void bankers_rounding(s21_big_decimal* b)
 
 int get_decimal(s21_big_decimal b, s21_decimal *result)
 {
+    if (!result) return 1;
+    init_decimal(result);
     bankers_rounding(&b);
     int error = 0;
     if(b.bits[5] || b.bits[4] || b.bits[3])
@@ -163,7 +167,7 @@ int get_decimal(s21_big_decimal b, s21_decimal *result)
         else error = 1;
     }
     else{
-        for(int i = 0; i < 3; i++) result->bit[i] = b.bits[i];
+        for(int i = 0; i < 3; i++) result->bits[i] = b.bits[i];
         set_scale(result, b.scale);
         set_sign(result, b.sign);
     }
@@ -184,32 +188,29 @@ int get_bit_big_decimal(s21_big_decimal b, int index)
 
 int is_zero(s21_decimal d)
 {
-    int ans = 1;
-    for(int i = 0; i <  96 && ans; i++)
-    {
-        if(get_bit(d, i)) ans = 0;
-    }
-    return ans;
+    return (d.bits[0] == 0 && d.bits[1] == 0 && d.bits[2] == 0);
 }
 
 void sub_process(s21_big_decimal b_1, s21_big_decimal b_2, s21_big_decimal *result_big)
 {
+    if (!result_big) return;
+    init_big_decimal(result_big);
     int curry = 0;
     for (int i = 0; i < 192; i++)
     {
-        int x = b_1.bits[i / 32] >> (i % 32) & 1;
-        int y = b_2.bits[i / 32] >> (i % 32) & 1;
+        int x = (b_1.bits[i / 32] >> (i % 32)) & 1;
+        int y = (b_2.bits[i / 32] >> (i % 32)) & 1;
 
         int result_d = x - y - curry;
         if (result_d >= 0)
         {
-            (*result_big).bits[i / 32] |= (result_d << (i % 32));
+            (*result_big).bits[i / 32] |= ((unsigned int)result_d << (i % 32));
             curry = 0;
         }
         else
         {
             curry = 1;
-            (*result_big).bits[i / 32] |= ((result_d + 2) << (i % 32));
+            (*result_big).bits[i / 32] |= ((unsigned int)(result_d + 2) << (i % 32));
         }
     }
 }
@@ -217,20 +218,29 @@ void sub_process(s21_big_decimal b_1, s21_big_decimal b_2, s21_big_decimal *resu
 
 void add_process(s21_big_decimal b_1, s21_big_decimal b_2, s21_big_decimal *result_big)
 {
+    if (!result_big) return;
+    init_big_decimal(result_big);
     int carry = 0;
     for(int i = 0; i < 192; i++)
+    {
+        int x = (b_1.bits[i/32] >> (i%32)) & 1;
+        int y = (b_2.bits[i/32] >> (i%32)) & 1;
+        int result_d = x + y + carry;
+        if(result_d < 2)
         {
-            int x = b_1.bits[i/32] >> (i%32) & 1;
-            int y = b_2.bits[i/32] >> (i%32) & 1;
-            int result_d = x + y + carry;
-            if(result_d < 2)
-            {
-                (*result_big).bits[i/32] |= (result_d << (i % 32));
-                carry = 0;
-            }
-            else{
-                (*result_big).bits[i/32] |= ((result_d - 2 ) << (i % 32));
-                carry = 1;
-            }
+            (*result_big).bits[i/32] |= ((unsigned int)result_d << (i % 32));
+            carry = 0;
         }
+        else{
+            (*result_big).bits[i/32] |= ((unsigned int)(result_d - 2) << (i % 32));
+            carry = 1;
+        }
+    }
+}
+
+s21_decimal abs_decimal(s21_decimal b)
+{
+    s21_decimal new_b = b;
+    set_sign(&new_b, 0);
+    return new_b;
 }
