@@ -14,9 +14,9 @@ int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result)
 
     int error = 0;
 
-    if (!(b_1.sign || b_2.sign) || (b_1.sign && b_2.sign))
+    if (b_1.sign == b_2.sign)
     {
-        if (s21_is_less(value_2, value_1))
+        if (is_greater_or_equal_big(b_1, b_2))
         {
             sub_process(b_1, b_2, &result_big);
             result_big.sign = b_1.sign;

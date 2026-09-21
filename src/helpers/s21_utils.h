@@ -48,3 +48,4 @@ void sub_process(s21_big_decimal b_1, s21_big_decimal b_2, s21_big_decimal *resu
 void add_process(s21_big_decimal b_1, s21_big_decimal b_2, s21_big_decimal *result_big); //функция для сложения decimal не смотрит на знаки decimal
 
 #endif
+int is_greater_or_equal_big(s21_big_decimal b_1, s21_big_decimal b_2);
