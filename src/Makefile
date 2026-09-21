@@ -3,7 +3,7 @@ CFLAGS =  -Wall -Werror -Wextra -std=c11
 
 TARGET = s21_decimal.a
 
-OBJ = operations/s21_add.o helpers/s21_utils.o comparison/s21_is_equal.o comparison/s21_is_less.o
+OBJ = operations/s21_add.o helpers/s21_utils.o comparison/s21_is_equal.o comparison/s21_is_less.o operations/s21_sub.o
 
 
 CHECK_LIBS = -lcheck -lsubunit -lm -lpthread
@@ -17,6 +17,9 @@ $(TARGET): $(OBJ)
 
 operations/s21_add.o: operations/s21_add.c
 	$(CC) $(CFLAGS) -c operations/s21_add.c -o operations/s21_add.o
+
+operations/s21_sub.o: operations/s21_sub.c
+	$(CC) $(CFLAGS) -c operations/s21_sub.c -o operations/s21_sub.o
 
 helpers/s21_utils.o: helpers/s21_utils.c
 	$(CC) $(CFLAGS) -c helpers/s21_utils.c -o helpers/s21_utils.o
@@ -34,7 +37,7 @@ test : clean $(TARGET)
 
 
 gcov_report: clean
-	$(CC) $(CFLAGS) $(GCOV_FLAGS) tests/test_runner.c tests/operations/*.c  operations/s21_add.c helpers/s21_utils.c comparison/s21_is_equal.c  comparison/s21_is_less.c $(CHECK_LIBS) -o test_gcov
+	$(CC) $(CFLAGS) $(GCOV_FLAGS) tests/test_runner.c tests/operations/*.c  operations/s21_add.c helpers/s21_utils.c comparison/s21_is_equal.c  comparison/s21_is_less.c  operations/s21_sub.c $(CHECK_LIBS) -o test_gcov
 	./test_gcov
 	lcov --capture --directory . --base-directory . --output-file coverage.info --no-external --ignore-errors inconsistent
 	genhtml coverage.info --output-directory report --ignore-errors source
