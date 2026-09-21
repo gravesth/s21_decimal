@@ -1,4 +1,5 @@
-#include "test_main.h"
+#include "../s21_decimal.h"
+#include "test_runner.h"
 
 /* ========================================================================== */
 /*                                s21_is_equal                                */
