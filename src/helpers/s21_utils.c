@@ -157,7 +157,6 @@ void bankers_rounding(s21_big_decimal* b)
 
 int get_decimal(s21_big_decimal b, s21_decimal *result)
 {
-    if (!result) return 1;
     init_decimal(result);
     bankers_rounding(&b);
     int error = 0;
