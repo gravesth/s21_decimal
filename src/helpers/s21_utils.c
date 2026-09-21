@@ -244,3 +244,13 @@ s21_decimal abs_decimal(s21_decimal b)
     set_sign(&new_b, 0);
     return new_b;
 }
+
+int is_greater_or_equal_big(s21_big_decimal b_1, s21_big_decimal b_2) {
+    int ans = -1;
+    for (int i = 5; i >= 0 && ans == -1; i--) {
+        if (b_1.bits[i] < b_2.bits[i]) ans = 0;
+        if (b_1.bits[i] > b_2.bits[i]) ans = 1;
+    }
+    if (ans == -1 ) ans = 1;
+    return ans; 
+}
