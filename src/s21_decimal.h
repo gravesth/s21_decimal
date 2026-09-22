@@ -25,5 +25,5 @@ int s21_is_greater(s21_decimal value_1, s21_decimal value_2);
 int s21_is_greater_or_equal(s21_decimal value_1, s21_decimal value_2);
 int s21_is_equal(s21_decimal value1, s21_decimal value2);
 int s21_is_not_equal(s21_decimal value_1, s21_decimal value_2);
-
+int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 #endif 
