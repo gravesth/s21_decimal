@@ -49,5 +49,5 @@ void add_process(s21_big_decimal b_1, s21_big_decimal b_2, s21_big_decimal *resu
 int is_greater_or_equal_big(s21_big_decimal b_1, s21_big_decimal b_2);
 
 
-void big_shl(s21_big_decimal *b, int value); //сдвиг влево для умножения big decimal
+s21_big_decimal big_shl(s21_big_decimal b, int value); //сдвиг влево для умножения big decimal
 #endif
