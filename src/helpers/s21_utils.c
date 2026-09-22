@@ -285,12 +285,12 @@ int is_greater_or_equal_big(s21_big_decimal b_1, s21_big_decimal b_2)
     return ans;
 }
 
-void big_shl(s21_big_decimal *b)
+void big_shl(s21_big_decimal *b, int value)
 {
 
-    for (int i = 191; i > 0; i--)
+    for (int i = 191; i > value - 1; i--)
     {
-        int bit = (b->bits[(i - 1) / 32] >> ((i - 1) % 32)) & 1;
+        int bit = (b->bits[(i - value) / 32] >> ((i - value) % 32)) & 1;
         if (bit)
         {
             b->bits[i / 32] |= (1U << (i % 32));
@@ -300,5 +300,8 @@ void big_shl(s21_big_decimal *b)
             b->bits[i / 32] &= ~(1U << (i % 32));
         }
     }
-    b->bits[0] &= ~1U;
+    for (int i = 0; i < value; i++)
+    {
+        b->bits[i / 32] &= ~(1U << (i % 32));
+    }
 }
