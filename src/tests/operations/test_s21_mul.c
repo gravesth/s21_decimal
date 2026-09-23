@@ -176,26 +176,28 @@ START_TEST(different_scale_test)
 }
 END_TEST
 
+
 START_TEST(bank_rounding_test)
 {
+
     s21_decimal d1, d2, result, expected;
 
     init_decimal(&d1);
     init_decimal(&d2);
     init_decimal(&result);
     init_decimal(&expected);
-    d1.bits[0] = 0x33333333;
-    d1.bits[1] = 0x33333333;
-    d1.bits[2] = 0x33333333;
-    set_scale(&d1, 1);
 
-    d2.bits[0] = 5;
-    set_scale(&d2, 1);
+    d1.bits[0] = 0xFFFFFFFF;
+    d1.bits[1] = 0xFFFFFFFF;
+    d1.bits[2] = 0xFFFFFFFF;
 
-    expected.bits[0] = 0xFFFFFFFE; 
-    expected.bits[1] = 0xFFFFFFFF;
-    expected.bits[2] = 0xFFFFFFFF;
-    set_scale(&expected, 1);    
+    d2.bits[0] = 33;
+    set_scale(&d2, 2);
+
+    expected.bits[0] = 0x47AE147B;
+    expected.bits[1] = 0xAE147AE1;
+    expected.bits[2] = 0x547AE147;
+    set_scale(&expected, 0);
     set_sign(&expected, 0);
 
     int status = s21_mul(d1, d2, &result);
@@ -205,7 +207,6 @@ START_TEST(bank_rounding_test)
         ck_assert_uint_eq(result.bits[i], expected.bits[i]);
 }
 END_TEST
-
 
 Suite *s21_mul_suite()
 {
