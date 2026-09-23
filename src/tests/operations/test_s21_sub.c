@@ -204,7 +204,7 @@ END_TEST
 
 Suite *s21_sub_suite()
 {
-    Suite *s = suite_create("s21_add_suite");
+    Suite *s = suite_create("s21_sub_suite");
 
     TCase *tc_core = tcase_create("Core_and_Zeros");
     tcase_add_test(tc_core, sub_zero_test);
