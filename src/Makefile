@@ -4,6 +4,7 @@ CFLAGS =  -Wall -Werror -Wextra -std=c11
 TARGET = s21_decimal.a
 
 OBJ = operations/s21_add.o \
+	  operations/s21_mul.o \
       operations/s21_sub.o \
       helpers/s21_utils.o \
       comparison/s21_is_equal.o \
@@ -22,6 +23,9 @@ all: $(TARGET)
 
 $(TARGET): $(OBJ)
 	ar rcs $(TARGET) $(OBJ)
+
+operations/s21_mul.o: operations/s21_mul.c
+	$(CC) $(CFLAGS) -c operations/s21_mul.c -o operations/s21_mul.o
 
 operations/s21_add.o: operations/s21_add.c
 	$(CC) $(CFLAGS) -c operations/s21_add.c -o operations/s21_add.o
