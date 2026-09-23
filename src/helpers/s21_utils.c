@@ -164,18 +164,25 @@ void bankers_rounding(s21_big_decimal *b)
 {
     clean_zeroes(b);
     int remainder = 0;
+    int had_nonzero_before = 0;
+
     while ((b->bits[5] != 0 || b->bits[4] != 0 || b->bits[3] != 0 || b->scale > 28) && b->scale != 0)
     {
+        if (remainder != 0)
+            had_nonzero_before = 1;  
+
         remainder = div_by_10(b);
         b->scale--;
     }
+
     s21_big_decimal current = *b;
     int last_remainder = div_by_10(&current);
-    if ((remainder > 5) || (remainder == 5 && last_remainder % 2))
+
+    if (remainder > 5 || (remainder == 5 && (had_nonzero_before || last_remainder % 2)))
         add_by_1(b);
+
     clean_zeroes(b);
 }
-
 int get_decimal(s21_big_decimal b, s21_decimal *result)
 {
     init_decimal(result);
