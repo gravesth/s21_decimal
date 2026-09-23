@@ -46,6 +46,8 @@ s21_decimal abs_decimal(s21_decimal b); // модуль decimal
 
 void sub_process(s21_big_decimal b_1, s21_big_decimal b_2, s21_big_decimal *result_big); //функция для разности decimal не смотрит на знаки decimal
 void add_process(s21_big_decimal b_1, s21_big_decimal b_2, s21_big_decimal *result_big); //функция для сложения decimal не смотрит на знаки decimal
-
-#endif
 int is_greater_or_equal_big(s21_big_decimal b_1, s21_big_decimal b_2);
+
+
+s21_big_decimal big_shl(s21_big_decimal b, int value); //сдвиг влево для умножения big decimal
+#endif
