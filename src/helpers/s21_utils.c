@@ -169,7 +169,7 @@ void bankers_rounding(s21_big_decimal *b)
     while ((b->bits[5] != 0 || b->bits[4] != 0 || b->bits[3] != 0 || b->scale > 28) && b->scale != 0)
     {
         if (remainder != 0)
-            had_nonzero_before = 1;  
+            had_nonzero_before = 1;
 
         remainder = div_by_10(b);
         b->scale--;
@@ -313,13 +313,43 @@ s21_big_decimal big_shl(s21_big_decimal b, int value)
     return b;
 }
 
-
 int len_big_decimal(s21_big_decimal b)
 {
     int len = 0;
-    for(int i = 191; i >= 0 && !len; i--)
+    for (int i = 191; i >= 0 && !len; i--)
     {
-        if((b.bits[i/32] >> (i%32))&1) len = i+1;
+        if ((b.bits[i / 32] >> (i % 32)) & 1)
+            len = i + 1;
     }
     return len;
+}
+
+int div_process(s21_big_decimal m1, s21_big_decimal m2, s21_big_decimal *remainder, s21_big_decimal *result)
+{
+    int error = 0;
+    int len1 = len_big_decimal(m1);
+    int len2 = len_big_decimal(m2);
+    init_big_decimal(result);
+    init_big_decimal(remainder);
+    s21_big_decimal a;
+    init_big_decimal(&a);
+    if (len2 == 0)
+        error = 3;
+    else if (len1 != 0)
+    {
+
+        for (int i = len1 - 1; i >= 0; i--)
+        {
+            a = big_shl(a, 1);
+            a.bits[0] |= ((m1.bits[i / 32] >> (i % 32)) & 1);
+            (*result) = big_shl(*result, 1);
+            if (is_greater_or_equal_big(a, m2))
+            {
+                result->bits[0] |= 1U;
+                sub_process(a, m2, &a);
+            }
+        }
+    }
+    (*remainder) = a;
+    return error;
 }
