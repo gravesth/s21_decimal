@@ -282,6 +282,127 @@ START_TEST(test_negate_double) {
 END_TEST
 
 /* ========================================================================== */
+/*                         s21_from_decimal_to_float                          */
+/* ========================================================================== */
+
+START_TEST(test_from_decimal_to_float_zero) {
+    s21_decimal src = {{0, 0, 0, 0}};
+    float dst = -1.0f;
+    ck_assert_int_eq(s21_from_decimal_to_float(src, &dst), 0);
+    ck_assert_float_eq(dst, 0.0f);
+}
+END_TEST
+
+START_TEST(test_from_decimal_to_float_negative_zero) {
+    s21_decimal src = {{0, 0, 0, (int)0x80000000}};
+    float dst = 1.0f;
+    ck_assert_int_eq(s21_from_decimal_to_float(src, &dst), 0);
+    ck_assert_float_eq(dst, 0.0f);
+    ck_assert_int_ne(signbit(dst), 0);
+}
+END_TEST
+
+START_TEST(test_from_decimal_to_float_positive) {
+    s21_decimal src = {{123456, 0, 0, 3 << 16}};  // 123.456
+    float dst = 0.0f;
+    ck_assert_int_eq(s21_from_decimal_to_float(src, &dst), 0);
+    ck_assert_float_eq_tol(dst, 123.456f, 1e-4f);
+}
+END_TEST
+
+START_TEST(test_from_decimal_to_float_negative) {
+    s21_decimal src = {{123456, 0, 0, (int)0x80030000}};  // -123.456
+    float dst = 0.0f;
+    ck_assert_int_eq(s21_from_decimal_to_float(src, &dst), 0);
+    ck_assert_float_eq_tol(dst, -123.456f, 1e-4f);
+}
+END_TEST
+
+START_TEST(test_from_decimal_to_float_null) {
+    s21_decimal src = {{1, 0, 0, 0}};
+    ck_assert_int_eq(s21_from_decimal_to_float(src, NULL), 1);
+}
+END_TEST
+
+START_TEST(test_from_decimal_to_float_invalid_scale) {
+    s21_decimal src = {{1, 0, 0, 29 << 16}};
+    float dst = 0.0f;
+    ck_assert_int_eq(s21_from_decimal_to_float(src, &dst), 1);
+}
+END_TEST
+
+/* ========================================================================== */
+/*                         s21_from_float_to_decimal                          */
+/* ========================================================================== */
+
+START_TEST(test_from_float_to_decimal_zero) {
+    s21_decimal dst;
+    ck_assert_int_eq(s21_from_float_to_decimal(0.0f, &dst), 0);
+    ck_assert_int_eq(dst.bits[0], 0);
+    ck_assert_int_eq(dst.bits[1], 0);
+    ck_assert_int_eq(dst.bits[2], 0);
+    ck_assert_int_eq(dst.bits[3], 0);
+}
+END_TEST
+
+START_TEST(test_from_float_to_decimal_negative_zero) {
+    s21_decimal dst;
+    ck_assert_int_eq(s21_from_float_to_decimal(-0.0f, &dst), 0);
+    ck_assert_int_eq(dst.bits[0], 0);
+    ck_assert_int_eq(dst.bits[1], 0);
+    ck_assert_int_eq(dst.bits[2], 0);
+    ck_assert_int_eq(dst.bits[3], (int)0x80000000);
+}
+END_TEST
+
+START_TEST(test_from_float_to_decimal_positive) {
+    s21_decimal dst;
+    ck_assert_int_eq(s21_from_float_to_decimal(123.456f, &dst), 0);
+    float back = 0.0f;
+    s21_from_decimal_to_float(dst, &back);
+    ck_assert_float_eq_tol(back, 123.456f, 1e-4f);
+}
+END_TEST
+
+START_TEST(test_from_float_to_decimal_negative) {
+    s21_decimal dst;
+    ck_assert_int_eq(s21_from_float_to_decimal(-12.34567f, &dst), 0);
+    float back = 0.0f;
+    s21_from_decimal_to_float(dst, &back);
+    ck_assert_float_eq_tol(back, -12.34567f, 1e-4f);
+}
+END_TEST
+
+START_TEST(test_from_float_to_decimal_too_small) {
+    s21_decimal dst;
+    ck_assert_int_eq(s21_from_float_to_decimal(1e-29f, &dst), 1);
+    ck_assert_int_eq(dst.bits[0], 0);
+    ck_assert_int_eq(dst.bits[1], 0);
+    ck_assert_int_eq(dst.bits[2], 0);
+    ck_assert_int_eq(dst.bits[3], 0);
+}
+END_TEST
+
+START_TEST(test_from_float_to_decimal_too_large) {
+    s21_decimal dst;
+    ck_assert_int_eq(s21_from_float_to_decimal(1e30f, &dst), 1);
+}
+END_TEST
+
+START_TEST(test_from_float_to_decimal_nan_inf) {
+    s21_decimal dst;
+    ck_assert_int_eq(s21_from_float_to_decimal(NAN, &dst), 1);
+    ck_assert_int_eq(s21_from_float_to_decimal(INFINITY, &dst), 1);
+    ck_assert_int_eq(s21_from_float_to_decimal(-INFINITY, &dst), 1);
+}
+END_TEST
+
+START_TEST(test_from_float_to_decimal_null) {
+    ck_assert_int_eq(s21_from_float_to_decimal(1.0f, NULL), 1);
+}
+END_TEST
+
+/* ========================================================================== */
 /*                               Suite Setup                                  */
 /* ========================================================================== */
 
@@ -314,6 +435,26 @@ Suite *suite_convertator(void) {
     tcase_add_test(tc_from_int, test_from_int_to_decimal_dst_null);
     suite_add_tcase(s, tc_from_int);
 
+    TCase *tc_to_float = tcase_create("from_decimal_to_float");
+    tcase_add_test(tc_to_float, test_from_decimal_to_float_zero);
+    tcase_add_test(tc_to_float, test_from_decimal_to_float_negative_zero);
+    tcase_add_test(tc_to_float, test_from_decimal_to_float_positive);
+    tcase_add_test(tc_to_float, test_from_decimal_to_float_negative);
+    tcase_add_test(tc_to_float, test_from_decimal_to_float_null);
+    tcase_add_test(tc_to_float, test_from_decimal_to_float_invalid_scale);
+    suite_add_tcase(s, tc_to_float);
+
+    TCase *tc_from_float = tcase_create("from_float_to_decimal");
+    tcase_add_test(tc_from_float, test_from_float_to_decimal_zero);
+    tcase_add_test(tc_from_float, test_from_float_to_decimal_negative_zero);
+    tcase_add_test(tc_from_float, test_from_float_to_decimal_positive);
+    tcase_add_test(tc_from_float, test_from_float_to_decimal_negative);
+    tcase_add_test(tc_from_float, test_from_float_to_decimal_too_small);
+    tcase_add_test(tc_from_float, test_from_float_to_decimal_too_large);
+    tcase_add_test(tc_from_float, test_from_float_to_decimal_nan_inf);
+    tcase_add_test(tc_from_float, test_from_float_to_decimal_null);
+    suite_add_tcase(s, tc_from_float);
+
     TCase *tc_roundtrip = tcase_create("roundtrip");
     tcase_add_test(tc_roundtrip, test_roundtrip_positive);
     tcase_add_test(tc_roundtrip, test_roundtrip_negative);
@@ -333,3 +474,4 @@ Suite *suite_convertator(void) {
 
     return s;
 }
+
