@@ -312,3 +312,14 @@ s21_big_decimal big_shl(s21_big_decimal b, int value)
     }
     return b;
 }
+
+
+int len_big_decimal(s21_big_decimal b)
+{
+    int len = 0;
+    for(int i = 191; i >= 0 && !len; i--)
+    {
+        if((b.bits[i/32] >> (i%32))&1) len = i+1;
+    }
+    return len;
+}
