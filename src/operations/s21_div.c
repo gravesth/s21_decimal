@@ -12,9 +12,7 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result)
     int scale_raw = b_1.scale - b_2.scale;
     int len = len_big_decimal(result_big);
 
-
-
-    if (error != 3 && len_big_decimal(result_big) != 0)
+    if (error != 3)
     {
         while (len <= 188 && len_big_decimal(remainder) != 0 && scale_raw <= 30)
         {
@@ -26,6 +24,9 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result)
             len = len_big_decimal(result_big);
             scale_raw++;
         }
+        }
+    if (error != 3)
+    {
         if (scale_raw < 0)
         {
             scale_raw *= -1;
@@ -35,11 +36,16 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result)
                 len = len_big_decimal(result_big);
                 scale_raw--;
             }
+            if(len > 188) error = (b_1.sign != b_2.sign) + 1;
+            result_big.scale = 0; 
         }
         else
         {
             result_big.scale = scale_raw;
         }
+    }
+    if(error == 0)
+    {
         result_big.sign = (b_1.sign != b_2.sign);
         error = get_decimal(result_big, result);
     }
