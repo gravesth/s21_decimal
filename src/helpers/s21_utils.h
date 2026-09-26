@@ -50,4 +50,7 @@ int is_greater_or_equal_big(s21_big_decimal b_1, s21_big_decimal b_2);
 
 
 s21_big_decimal big_shl(s21_big_decimal b, int value); //сдвиг влево для умножения big decimal
+
+int len_big_decimal(s21_big_decimal b);//длина decimal (используем в делении)
+int div_process(s21_big_decimal m1, s21_big_decimal m2, s21_big_decimal *remainder, s21_big_decimal *result);
 #endif

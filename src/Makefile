@@ -12,7 +12,8 @@ OBJ = operations/s21_add.o \
       comparison/s21_is_greater.o \
       comparison/s21_is_greater_or_equal.o \
       comparison/s21_is_less_or_equal.o \
-      comparison/s21_is_not_equal.o
+      comparison/s21_is_not_equal.o \
+	  operations/s21_div.o
 
 
 CHECK_LIBS = -lcheck -lsubunit -lm -lpthread
@@ -23,6 +24,9 @@ all: $(TARGET)
 
 $(TARGET): $(OBJ)
 	ar rcs $(TARGET) $(OBJ)
+
+operations/s21_div.o: operations/s21_div.c
+	$(CC) $(CFLAGS) -c operations/s21_div.c -o operations/s21_div.o
 
 operations/s21_mul.o: operations/s21_mul.c
 	$(CC) $(CFLAGS) -c operations/s21_mul.c -o operations/s21_mul.o
