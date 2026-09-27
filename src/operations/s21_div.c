@@ -1,53 +1,49 @@
-#include "../s21_decimal.h"
-#include "../helpers/s21_utils.h"
-int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result)
-{
-    s21_big_decimal b_1, b_2, result_big;
-    init_big_decimal(&result_big);
-    get_big_decimal(value_1, &b_1);
-    get_big_decimal(value_2, &b_2);
-    s21_big_decimal remainder, digit;
+#include "../s21_internal.h"
 
-    int error = div_process(b_1, b_2, &remainder, &result_big);
-    int scale_raw = b_1.scale - b_2.scale;
-    int len = len_big_decimal(result_big);
+int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
+  if (result == NULL) return S21_TOO_BIG;
+  s21_init_decimal(result);
+  if (s21_is_zero(value_2)) return S21_DIV_BY_ZERO;
+  if (s21_is_zero(value_1)) return S21_OK;
 
-    if (error != 3)
-    {
-        while (len <= 188 && len_big_decimal(remainder) != 0 && scale_raw <= 30)
-        {
-            mul_by_10(&remainder);
-            div_process(remainder, b_2, &remainder, &digit);
-            mul_by_10(&result_big);
-            add_process(result_big, digit, &result_big);
+  s21_big_decimal dividend;
+  s21_big_decimal divisor;
+  s21_big_from_decimal(value_1, &dividend);
+  s21_big_from_decimal(value_2, &divisor);
+  int sign = dividend.sign ^ divisor.sign;
 
-            len = len_big_decimal(result_big);
-            scale_raw++;
-        }
-        }
-    if (error != 3)
-    {
-        if (scale_raw < 0)
-        {
-            scale_raw *= -1;
-            while (scale_raw > 0 && len <= 188)
-            {
-                mul_by_10(&result_big);
-                len = len_big_decimal(result_big);
-                scale_raw--;
-            }
-            if(len > 188) error = (b_1.sign != b_2.sign) + 1;
-            result_big.scale = 0; 
-        }
-        else
-        {
-            result_big.scale = scale_raw;
-        }
+  while (dividend.scale < divisor.scale) {
+    s21_big_mul10(&dividend);
+    dividend.scale++;
+  }
+
+  s21_big_decimal quotient;
+  s21_big_decimal remainder;
+  s21_big_divmod(&dividend, &divisor, &quotient, &remainder);
+  quotient.scale = dividend.scale - divisor.scale;
+  quotient.sign = sign;
+
+  int tail = 0;
+  while (!s21_big_is_zero(&remainder) && quotient.scale <= 28 && !tail) {
+    s21_big_decimal expanded = quotient;
+    s21_big_decimal digit;
+    s21_big_decimal next_remainder;
+    s21_big_decimal next_quotient;
+    int failed = s21_big_mul10(&expanded);
+    if (!failed) {
+      s21_big_mul10(&remainder);
+      s21_big_divmod(&remainder, &divisor, &digit, &next_remainder);
+      failed = s21_big_add(&expanded, &digit, &next_quotient);
     }
-    if(error == 0)
-    {
-        result_big.sign = (b_1.sign != b_2.sign);
-        error = get_decimal(result_big, result);
+    if (failed) {
+      tail = 1;
+    } else {
+      next_quotient.scale = quotient.scale + 1;
+      next_quotient.sign = sign;
+      quotient = next_quotient;
+      remainder = next_remainder;
     }
-    return error;
+  }
+  if (!s21_big_is_zero(&remainder)) tail = 1;
+  return s21_big_to_decimal(&quotient, tail, result);
 }

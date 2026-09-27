@@ -1,83 +1,55 @@
 CC = gcc
-CFLAGS =  -Wall -Werror -Wextra -std=c11
+CFLAGS = -Wall -Werror -Wextra -std=c11 -pedantic
+CHECK_CFLAGS = $(shell pkg-config --cflags check)
+CHECK_LIBS = $(shell pkg-config --libs check) -pthread
 
-TARGET = s21_decimal.a
+SRC = helpers/s21_utils.c \
+      operations/s21_add.c \
+      operations/s21_sub.c \
+      operations/s21_mul.c \
+      operations/s21_div.c \
+      comparison/s21_is_equal.c \
+      comparison/s21_is_not_equal.c \
+      comparison/s21_is_less.c \
+      comparison/s21_is_less_or_equal.c \
+      comparison/s21_is_greater.c \
+      comparison/s21_is_greater_or_equal.c \
+      converters/s21_converters.c \
+      other/s21_other.c
 
-OBJ = operations/s21_add.o \
-	  operations/s21_mul.o \
-      operations/s21_sub.o \
-      helpers/s21_utils.o \
-      comparison/s21_is_equal.o \
-      comparison/s21_is_less.o \
-      comparison/s21_is_greater.o \
-      comparison/s21_is_greater_or_equal.o \
-      comparison/s21_is_less_or_equal.o \
-      comparison/s21_is_not_equal.o \
-	  operations/s21_div.o
+OBJ = $(SRC:.c=.o)
 
+TEST_SRC = tests/test_runner.c \
+           tests/test_comparison.c \
+           tests/test_converters.c \
+           tests/test_other.c \
+           tests/test_extra.c \
+           tests/operations/test_s21_add.c \
+           tests/operations/test_s21_sub.c \
+           tests/operations/test_s21_mul.c \
+           tests/operations/test_s21_div.c
 
-CHECK_LIBS = -lcheck -lsubunit -lm -lpthread
+.PHONY: all clean test gcov_report s21_decimal.a
 
-GCOV_FLAGS = -fprofile-arcs -ftest-coverage
+all: s21_decimal.a
 
-all: $(TARGET)
+s21_decimal.a: $(OBJ)
+	ar rcs $@ $(OBJ)
 
-$(TARGET): $(OBJ)
-	ar rcs $(TARGET) $(OBJ)
+%.o: %.c s21_decimal.h s21_internal.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
-operations/s21_div.o: operations/s21_div.c
-	$(CC) $(CFLAGS) -c operations/s21_div.c -o operations/s21_div.o
-
-operations/s21_mul.o: operations/s21_mul.c
-	$(CC) $(CFLAGS) -c operations/s21_mul.c -o operations/s21_mul.o
-
-operations/s21_add.o: operations/s21_add.c
-	$(CC) $(CFLAGS) -c operations/s21_add.c -o operations/s21_add.o
-
-operations/s21_sub.o: operations/s21_sub.c
-	$(CC) $(CFLAGS) -c operations/s21_sub.c -o operations/s21_sub.o
-
-helpers/s21_utils.o: helpers/s21_utils.c
-	$(CC) $(CFLAGS) -c helpers/s21_utils.c -o helpers/s21_utils.o
-
-comparison/s21_is_equal.o: comparison/s21_is_equal.c
-	$(CC) $(CFLAGS) -c comparison/s21_is_equal.c -o comparison/s21_is_equal.o
-
-comparison/s21_is_less.o: comparison/s21_is_less.c
-	$(CC) $(CFLAGS) -c comparison/s21_is_less.c -o comparison/s21_is_less.o
-
-comparison/s21_is_greater.o: comparison/s21_is_greater.c
-	$(CC) $(CFLAGS) -c comparison/s21_is_greater.c -o comparison/s21_is_greater.o
-
-comparison/s21_is_greater_or_equal.o: comparison/s21_is_greater_or_equal.c
-	$(CC) $(CFLAGS) -c comparison/s21_is_greater_or_equal.c -o comparison/s21_is_greater_or_equal.o
-
-comparison/s21_is_less_or_equal.o: comparison/s21_is_less_or_equal.c
-	$(CC) $(CFLAGS) -c comparison/s21_is_less_or_equal.c -o comparison/s21_is_less_or_equal.o
-
-
-comparison/s21_is_not_equal.o: comparison/s21_is_not_equal.c
-	$(CC) $(CFLAGS) -c comparison/s21_is_not_equal.c -o comparison/s21_is_not_equal.o
-
-test : clean $(TARGET)
-	$(CC) $(CFLAGS) tests/test_runner.c tests/operations/*.c  tests/test_comparison.c $(TARGET)  $(CHECK_LIBS) -o test
+test: s21_decimal.a
+	$(CC) $(CFLAGS) $(CHECK_CFLAGS) $(TEST_SRC) s21_decimal.a $(CHECK_LIBS) -o test
 	./test
 
-
-gcov_report: clean
-	$(CC) $(CFLAGS) $(GCOV_FLAGS) tests/test_runner.c tests/operations/*.c  tests/test_comparison.c  helpers/s21_utils.c comparison/*.c  operations/*.c $(CHECK_LIBS) -o test_gcov
-	./test_gcov
-	lcov --capture --directory . --base-directory . --output-file coverage.info --no-external --ignore-errors inconsistent
-	genhtml coverage.info --output-directory report --ignore-errors source
-
-style:
-	clang-format -i operations/*.c comparison/*.c *.c *.h tests/*.c tests/*.h tests/operations/*.c
+gcov_report:
+	$(MAKE) clean
+	$(MAKE) test CFLAGS="$(CFLAGS) --coverage" CHECK_LIBS="$(CHECK_LIBS) --coverage"
+	lcov --capture --directory . --output-file coverage.info --no-external
+	lcov --remove coverage.info '*/tests/*' --output-file coverage.info
+	genhtml coverage.info --output-directory report
 
 clean:
-	rm -f $(TARGET) test test_gcov coverage.info
-	rm -f operations/*.o helpers/*.o *.o comparison/*.o
-	rm -f operations/*.gcda operations/*.gcno comparison/*.gcda comparison/*.gcno helpers/*.gcda helpers/*.gcno *.gcda *.gcno
-	rm -rf report
-
-
-.PHONY: all test clean gcov_report style
+	rm -rf $(OBJ) s21_decimal.a test coverage.info report
+	find . \( -name '*.gcda' -o -name '*.gcno' -o -name '*.gcov' \) -delete

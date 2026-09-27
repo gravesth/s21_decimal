@@ -56,3 +56,11 @@ dkms.conf
 .clangd
 .cache/
 compile_commands.json
+
+# Test binary and gcov report
+test
+*.gcno
+*.gcda
+*.gcov
+coverage.info
+report/

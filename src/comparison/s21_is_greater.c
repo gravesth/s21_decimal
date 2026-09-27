@@ -1,5 +1,5 @@
 #include "../s21_decimal.h"
 
-int s21_is_greater(s21_decimal a, s21_decimal b){
-    return !s21_is_less(a, b) && !s21_is_equal(a, b);
-};
+int s21_is_greater(s21_decimal value_1, s21_decimal value_2) {
+  return !s21_is_less(value_1, value_2) && !s21_is_equal(value_1, value_2);
+}
