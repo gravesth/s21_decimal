@@ -97,11 +97,11 @@ convertator/s21_round.o: convertator/s21_round.c
 	$(CC) $(CFLAGS) -c convertator/s21_round.c -o convertator/s21_round.o
 
 test : clean $(TARGET)
-	$(CC) $(CFLAGS) $(CHECK_FLAGS) tests/test_runner.c tests/operations/*.c tests/test_comparison.c tests/test_convertator.c $(TARGET) $(CHECK_LIBS) -o test
+	$(CC) $(CFLAGS) $(CHECK_FLAGS) tests/test_runner.c tests/operations/*.c tests/test_comparison.c tests/test_convertator.c tests/test_other.c $(TARGET) $(CHECK_LIBS) -o test
 	./test
 
 gcov_report: clean
-	$(CC) $(CFLAGS) $(CHECK_FLAGS) $(GCOV_FLAGS) tests/test_runner.c tests/operations/*.c tests/test_comparison.c tests/test_convertator.c helpers/s21_utils.c comparison/*.c operations/*.c convertator/*.c $(CHECK_LIBS) -o test_gcov
+	$(CC) $(CFLAGS) $(CHECK_FLAGS) $(GCOV_FLAGS) tests/test_runner.c tests/operations/*.c tests/test_comparison.c tests/test_convertator.c tests/test_other.c helpers/s21_utils.c comparison/*.c operations/*.c convertator/*.c $(CHECK_LIBS) -o test_gcov
 	./test_gcov
 	lcov --capture --directory . --base-directory . --output-file coverage.info --no-external --ignore-errors inconsistent
 	genhtml coverage.info --output-directory report --ignore-errors source

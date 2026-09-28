@@ -6,3 +6,4 @@ Suite *suite_comparison();
 Suite *s21_mul_suite();
 Suite *s21_div_suite();
 Suite *suite_convertator();
+Suite *suite_other();
