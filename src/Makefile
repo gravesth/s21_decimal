@@ -18,7 +18,10 @@ OBJ = operations/s21_add.o \
       convertator/s21_from_decimal_to_int.o \
       convertator/s21_from_float_to_decimal.o \
       convertator/s21_from_int_to_decimal.o \
-      convertator/s21_negate.o
+      convertator/s21_negate.o \
+      convertator/s21_truncate.o \
+      convertator/s21_floor.o \
+      convertator/s21_round.o
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S), Darwin)
@@ -83,6 +86,15 @@ convertator/s21_from_int_to_decimal.o: convertator/s21_from_int_to_decimal.c
 
 convertator/s21_negate.o: convertator/s21_negate.c
 	$(CC) $(CFLAGS) -c convertator/s21_negate.c -o convertator/s21_negate.o
+
+convertator/s21_truncate.o: convertator/s21_truncate.c
+	$(CC) $(CFLAGS) -c convertator/s21_truncate.c -o convertator/s21_truncate.o
+
+convertator/s21_floor.o: convertator/s21_floor.c
+	$(CC) $(CFLAGS) -c convertator/s21_floor.c -o convertator/s21_floor.o
+
+convertator/s21_round.o: convertator/s21_round.c
+	$(CC) $(CFLAGS) -c convertator/s21_round.c -o convertator/s21_round.o
 
 test : clean $(TARGET)
 	$(CC) $(CFLAGS) $(CHECK_FLAGS) tests/test_runner.c tests/operations/*.c tests/test_comparison.c tests/test_convertator.c $(TARGET) $(CHECK_LIBS) -o test
