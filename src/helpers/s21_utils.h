@@ -3,6 +3,7 @@
 
 #include "../s21_decimal.h"
 
+
 int get_bit(s21_decimal d, int index); //получить любой бит по индексу (0 - 127)
 
 void set_bit(s21_decimal *d, int index, int value); // (установить любой бит по индексу (0 - 127))
@@ -40,7 +41,16 @@ int get_bit_big_decimal(s21_big_decimal b, int index); //получение би
 
 int is_zero(s21_decimal d); //проверка decimal на +-0
 
+s21_decimal abs_decimal(s21_decimal b); // модуль decimal 
+
+
 void sub_process(s21_big_decimal b_1, s21_big_decimal b_2, s21_big_decimal *result_big); //функция для разности decimal не смотрит на знаки decimal
 void add_process(s21_big_decimal b_1, s21_big_decimal b_2, s21_big_decimal *result_big); //функция для сложения decimal не смотрит на знаки decimal
+int is_greater_or_equal_big(s21_big_decimal b_1, s21_big_decimal b_2);
 
-#endif  // S21_UTILS_H
+
+s21_big_decimal big_shl(s21_big_decimal b, int value); //сдвиг влево для умножения big decimal
+
+int len_big_decimal(s21_big_decimal b);//длина decimal (используем в делении)
+int div_process(s21_big_decimal m1, s21_big_decimal m2, s21_big_decimal *remainder, s21_big_decimal *result);
+#endif

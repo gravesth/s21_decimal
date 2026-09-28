@@ -4,10 +4,12 @@
 #include "../s21_decimal.h"
 
 int s21_from_decimal_to_float(s21_decimal src, float *dst) {
-  if (dst == NULL) return 1;
+  if (dst == NULL)
+    return 1;
 
   int scale = get_scale(src);
-  if (scale > 28 || scale < 0) return 1;
+  if (scale > 28 || scale < 0)
+    return 1;
 
   double temp = 0.0;
   for (int i = 0; i < 96; i++) {

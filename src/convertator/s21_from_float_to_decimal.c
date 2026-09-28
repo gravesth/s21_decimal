@@ -7,15 +7,19 @@
 #include "../s21_decimal.h"
 
 int s21_from_float_to_decimal(float src, s21_decimal *dst) {
-  if (!dst || isnan(src) || isinf(src)) return 1;
+  if (!dst || isnan(src) || isinf(src))
+    return 1;
 
   init_decimal(dst);
 
-  if (fabsf(src) > 7.9228162514264337593543950335e28f) return 1;
-  if (fabsf(src) > 0.0f && fabsf(src) < 1e-28f) return 1;
+  if (fabsf(src) > 7.9228162514264337593543950335e28f)
+    return 1;
+  if (fabsf(src) > 0.0f && fabsf(src) < 1e-28f)
+    return 1;
 
   if (fabsf(src) == 0.0f) {
-    if (signbit(src)) set_sign(dst, 1);
+    if (signbit(src))
+      set_sign(dst, 1);
     return 0;
   }
 
