@@ -1,10 +1,10 @@
 CC = gcc
-CFLAGS =  -Wall -Werror -Wextra -std=c11
+CFLAGS = -Wall -Werror -Wextra -std=c11
 
 TARGET = s21_decimal.a
 
 OBJ = operations/s21_add.o \
-	  operations/s21_mul.o \
+      operations/s21_mul.o \
       operations/s21_sub.o \
       helpers/s21_utils.o \
       comparison/s21_is_equal.o \
@@ -13,10 +13,24 @@ OBJ = operations/s21_add.o \
       comparison/s21_is_greater_or_equal.o \
       comparison/s21_is_less_or_equal.o \
       comparison/s21_is_not_equal.o \
-	  operations/s21_div.o
+      operations/s21_div.o \
+      convertator/s21_from_decimal_to_float.o \
+      convertator/s21_from_decimal_to_int.o \
+      convertator/s21_from_float_to_decimal.o \
+      convertator/s21_from_int_to_decimal.o \
+      convertator/s21_negate.o \
+      convertator/s21_truncate.o \
+      convertator/s21_floor.o \
+      convertator/s21_round.o
 
-
-CHECK_LIBS = -lcheck -lsubunit -lm -lpthread
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S), Darwin)
+    CHECK_FLAGS = $(shell [ -d /opt/homebrew/include ] && echo "-I/opt/homebrew/include" || echo "-I/usr/local/include")
+    CHECK_LIBS = $(shell [ -d /opt/homebrew/lib ] && echo "-L/opt/homebrew/lib" || echo "-L/usr/local/lib") -lcheck -lm -lpthread
+else
+    CHECK_FLAGS =
+    CHECK_LIBS = -lcheck -lsubunit -lm -lpthread
+endif
 
 GCOV_FLAGS = -fprofile-arcs -ftest-coverage
 
@@ -55,29 +69,50 @@ comparison/s21_is_greater_or_equal.o: comparison/s21_is_greater_or_equal.c
 comparison/s21_is_less_or_equal.o: comparison/s21_is_less_or_equal.c
 	$(CC) $(CFLAGS) -c comparison/s21_is_less_or_equal.c -o comparison/s21_is_less_or_equal.o
 
-
 comparison/s21_is_not_equal.o: comparison/s21_is_not_equal.c
 	$(CC) $(CFLAGS) -c comparison/s21_is_not_equal.c -o comparison/s21_is_not_equal.o
 
+convertator/s21_from_decimal_to_float.o: convertator/s21_from_decimal_to_float.c
+	$(CC) $(CFLAGS) -c convertator/s21_from_decimal_to_float.c -o convertator/s21_from_decimal_to_float.o
+
+convertator/s21_from_decimal_to_int.o: convertator/s21_from_decimal_to_int.c
+	$(CC) $(CFLAGS) -c convertator/s21_from_decimal_to_int.c -o convertator/s21_from_decimal_to_int.o
+
+convertator/s21_from_float_to_decimal.o: convertator/s21_from_float_to_decimal.c
+	$(CC) $(CFLAGS) -c convertator/s21_from_float_to_decimal.c -o convertator/s21_from_float_to_decimal.o
+
+convertator/s21_from_int_to_decimal.o: convertator/s21_from_int_to_decimal.c
+	$(CC) $(CFLAGS) -c convertator/s21_from_int_to_decimal.c -o convertator/s21_from_int_to_decimal.o
+
+convertator/s21_negate.o: convertator/s21_negate.c
+	$(CC) $(CFLAGS) -c convertator/s21_negate.c -o convertator/s21_negate.o
+
+convertator/s21_truncate.o: convertator/s21_truncate.c
+	$(CC) $(CFLAGS) -c convertator/s21_truncate.c -o convertator/s21_truncate.o
+
+convertator/s21_floor.o: convertator/s21_floor.c
+	$(CC) $(CFLAGS) -c convertator/s21_floor.c -o convertator/s21_floor.o
+
+convertator/s21_round.o: convertator/s21_round.c
+	$(CC) $(CFLAGS) -c convertator/s21_round.c -o convertator/s21_round.o
+
 test : clean $(TARGET)
-	$(CC) $(CFLAGS) tests/test_runner.c tests/operations/*.c  tests/test_comparison.c $(TARGET)  $(CHECK_LIBS) -o test
+	$(CC) $(CFLAGS) $(CHECK_FLAGS) tests/test_runner.c tests/operations/*.c tests/test_comparison.c tests/test_convertator.c tests/test_other.c $(TARGET) $(CHECK_LIBS) -o test
 	./test
 
-
 gcov_report: clean
-	$(CC) $(CFLAGS) $(GCOV_FLAGS) tests/test_runner.c tests/operations/*.c  tests/test_comparison.c  helpers/s21_utils.c comparison/*.c  operations/*.c $(CHECK_LIBS) -o test_gcov
+	$(CC) $(CFLAGS) $(CHECK_FLAGS) $(GCOV_FLAGS) tests/test_runner.c tests/operations/*.c tests/test_comparison.c tests/test_convertator.c tests/test_other.c helpers/s21_utils.c comparison/*.c operations/*.c convertator/*.c $(CHECK_LIBS) -o test_gcov
 	./test_gcov
 	lcov --capture --directory . --base-directory . --output-file coverage.info --no-external --ignore-errors inconsistent
 	genhtml coverage.info --output-directory report --ignore-errors source
 
 style:
-	clang-format -i operations/*.c comparison/*.c *.c *.h tests/*.c tests/*.h tests/operations/*.c
+	clang-format -i operations/*.c comparison/*.c convertator/*.c helpers/*.c helpers/*.h *.h tests/*.c tests/*.h tests/operations/*.c
 
 clean:
 	rm -f $(TARGET) test test_gcov coverage.info
-	rm -f operations/*.o helpers/*.o *.o comparison/*.o
-	rm -f operations/*.gcda operations/*.gcno comparison/*.gcda comparison/*.gcno helpers/*.gcda helpers/*.gcno *.gcda *.gcno
+	rm -f operations/*.o helpers/*.o comparison/*.o convertator/*.o *.o
+	rm -f operations/*.gcda operations/*.gcno comparison/*.gcda comparison/*.gcno helpers/*.gcda helpers/*.gcno convertator/*.gcda convertator/*.gcno *.gcda *.gcno
 	rm -rf report
-
 
 .PHONY: all test clean gcov_report style
